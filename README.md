@@ -39,4 +39,12 @@ STEPS FOR BELLY-BUTTON CHALLENGE:
    
 6. created layout for the dashboard. 
 
-7. Deployed the app to a free static page GitHub Pages. 
+7. Deployed the app to a free static page GitHub Pages.
+
+References:
+
+1. https://stackoverflow.com/questions/59974916/how-to-add-an-index-to-each-option-as-a-value
+
+2. https://plotly.com/javascript/colorscales/
+
+3. https://progate.com/docs/github-pages
