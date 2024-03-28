@@ -10,7 +10,7 @@ d3.json(url).then(function(data) {
 })
 
 // To select the new sample
-var sampleSelector = d3.select("#selDataset")
+let sampleSelector = d3.select("#selDataset")
 
 function init() {
     d3.json(url).then(function(data) {
@@ -19,11 +19,12 @@ function init() {
         let sampleName = data.names
         // let sampleData = data.samples
         console.log("sample names are", sampleName)
-        // Inserts the selected sample id 
+        // Inserts the selected id from names
         for(let i=0;i<sampleName.length;i++){
           let sampleId = sampleName[i]
           sampleSelector.append("option").text(sampleId).property("value",sampleId)};
-    
+
+    // To Call the functions with the first id
         barChart(sampleName[0]);
         bubbleChart(sampleName[0]);
         sampleMetadata(sampleName[0]);
@@ -32,7 +33,7 @@ function init() {
     init();
 
 
-    // Updates the charts when the sample is changed
+    // Updates the charts when the sample id is changed
     function optionChanged(sampleId){
         barChart(sampleId)
         bubbleChart(sampleId)
@@ -40,23 +41,23 @@ function init() {
         console.log("The sample id value is:",sampleId)
             }
 
-    //  Horizontal Bar chart with the top 10 samples
+    //  Horizontal Bar chart with the top 10 samples 
     function barChart(sampleId){
         d3.json(url).then(function(data) {
         // To get the samples data and store it in the array
             let sampleData_bar = data.samples; 
-            console.log("sampledata is:",sampleData_bar)
+            console.log("Samples data:",sampleData_bar)
 // Arrow function is used to filter and get the sample values, out_ids and otu_labels for that filtered sample id
 // To check if the id property of each sample object from the array sampleData is equal to the sampleId
             let filteredValue_bar= sampleData_bar.filter(sample => sample.id == sampleId)
             let sampleValData_bar = filteredValue_bar[0]
             console.log("filtered value",filteredValue_bar)
-            console.log("samplevalue",sampleValData_bar)
+            console.log("Sample data for the filtered id: ",sampleValData_bar)
             let x_sampleValues_bar = sampleValData_bar.sample_values;
             let y_otuIds_bar= sampleValData_bar.otu_ids;
             let otuLabels_bar = sampleValData_bar.otu_labels;
+
             // console.log("x is",x_sampleValues);
-        
         //    console.log("y_otuIds", y_otuIds);
         //    console.log("otuLabels",otuLabels);
 
@@ -64,9 +65,10 @@ function init() {
            let x_sampleSlice_bar =x_sampleValues_bar.slice(0, 10).reverse();
            let y_otuIdsSlice_bar = y_otuIds_bar.slice(0, 10).map(id => `OTU ${id}`).reverse();
            let otuLabelsSlice_bar = otuLabels_bar.slice(0, 10).reverse();
-           console.log(x_sampleSlice_bar);
-           console.log(y_otuIdsSlice_bar);
-           console.log(otuLabelsSlice_bar);
+           console.log("Sample values for the filtered id: ", x_sampleSlice_bar);
+           console.log("OTU IDs for the filtered id: ",y_otuIdsSlice_bar);
+           console.log("OTU Labels for the filtered id:", otuLabelsSlice_bar);
+
         // To plot the bar chart
            let trace1 = {
            x: x_sampleSlice_bar,
@@ -91,14 +93,15 @@ function init() {
         }
         Plotly.newPlot("bar", dataTrace, layout);
     })};
-    barChart();
+    // barChart();
+
+// Create a bubble chart that displays each sample.
 
     function bubbleChart(sampleId){
         d3.json(url).then(function(data) {
             // To get the samples and store it in sampleData array
            let sampleData = data.samples;
            
-        //    console.log("sample id", sampleId)
 
 // Arrow function is used to filter and get the sample values, out_ids and otu_labels for that filtered sample id
 // To check if the id property of each sample object from the array sampleData is equal to the sampleId
@@ -106,11 +109,16 @@ function init() {
            let filteredValue = sampleData.filter(sample => sample.id == sampleId)
            let sampleValData = filteredValue[0]
            console.log("filtered value",filteredValue)
-           console.log("samplevalue",sampleValData)
+           console.log("Sample data for the filtered id: ",sampleValData)
+
            let sample_values = sampleValData.sample_values;
-        //    console.log("sample_values are:",sample_values1)
            let otu_ids= sampleValData.otu_ids;
            let otu_labels = sampleValData.otu_labels;
+
+        //    console.log("Sample values for the filtered id: ", sample_values);
+        //    console.log("OTU IDs for the filtered id: ",otu_ids);
+        //    console.log("OTU Labels for the filtered id:", otu_labels);
+
         //    To plot the bubble chart
            let trace2 = {
             x:otu_ids,
@@ -126,35 +134,40 @@ function init() {
     
     // Data array
         let dataTrace2 = [trace2];
+
     // Apply a title to the layout
         let layout2 = {
                 title:"<b>Bubble Chart for each id based <br> on sample size</b><br>",
                 // showlegend: false,
                 height: 800,
-                width: 800
+                width: 800,
+                xaxis: {title: "OTU ID"}
               };
        
         Plotly.newPlot("bubble", dataTrace2, layout2);
       
         
     })};
-    bubbleChart();
+    // bubbleChart();
     
     
     function sampleMetadata(sampleId){
-        d3.json(url).then(function(data) {
+        d3.json(url).then(function(data){
             console.log("sample id is:", sampleId)
             let MetadataSample = d3.select("#sample-metadata").html("")
             let metaData = data.metadata;
-            let M_filteredValue = metaData.filter(sample => sample.id == sampleId)[0]
-            // let M_sampleValData = M_filteredValue[0]
-            console.log("Meta filtered value",M_filteredValue)
-            Object.entries(M_filteredValue ).forEach(([key, value]) => {
+            let M_filteredValue = metaData.filter((sample) => sample.id == sampleId)
+            let M_sampleValData = M_filteredValue[0]
+            console.log("Individual's demographic information: ",M_filteredValue)
+
+            // Build-in Javascript object that returns an array of key-value pairs
+            key_value = Object.entries(M_sampleValData)
+            key_value.forEach(([key, value]) => {
                     MetadataSample.append("h6").text(`${key}: ${value}`)});
           
         
     })};
    
-    sampleMetadata();
+    // sampleMetadata();
     
     
